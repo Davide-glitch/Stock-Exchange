@@ -1,3 +1,9 @@
+package simulation;
+
+import engine.StockExchange;
+import model.Order;
+import model.OrderType;
+
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,7 +30,6 @@ public class Trader implements Runnable {
         for (int i = 0; i < operationsCount; i++) {
             String ticker = tickers.get(random.nextInt(tickers.size()));
             OrderType type = random.nextBoolean() ? OrderType.BUY : OrderType.SELL;
-
             double price = Math.round((95.0 + random.nextDouble() * 10.0) * 100.0) / 100.0;
             int quantity = 1 + random.nextInt(10);
 
@@ -34,7 +39,7 @@ public class Trader implements Runnable {
             exchange.submitOrder(order);
 
             try {
-                Thread.sleep(random.nextInt(4));
+                Thread.sleep(random.nextInt(3));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;

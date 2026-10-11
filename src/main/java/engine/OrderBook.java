@@ -1,4 +1,4 @@
-﻿package engine;
+package engine;
 
 import model.Order;
 import model.OrderType;
@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 public class OrderBook {
     private final String ticker;
+    // Explicit ReentrantLock provides mutual exclusion without carrier-thread pinning
     private final ReentrantLock lock;
     private static final AtomicLong TX_ID_GENERATOR = new AtomicLong(1);
 

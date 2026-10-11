@@ -1,4 +1,4 @@
-﻿package engine;
+package engine;
 
 import model.Order;
 import model.Transaction;
@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class StockExchange {
+    // Per-ticker fine-grained structure: concurrent reads without coarse locking
     private final Map<String, OrderBook> books = new ConcurrentHashMap<>();
     private final ConcurrentLinkedQueue<Transaction> history = new ConcurrentLinkedQueue<>();
 

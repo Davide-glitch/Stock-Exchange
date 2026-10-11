@@ -1,4 +1,4 @@
-﻿import engine.OrderBook;
+import engine.OrderBook;
 import engine.StockExchange;
 import model.Transaction;
 import simulation.Trader;
@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("Running Correct Concurrent Stock Exchange (ReentrantLock)...");
+        System.out.println("Running Correct Concurrent Stock Exchange...");
 
         StockExchange exchange = new StockExchange();
         List<String> tickers = List.of("AAPL", "GOOGL", "MSFT");
@@ -60,7 +60,7 @@ public class Main {
         if (totalSubmitted == accountedShares) {
             System.out.println("CONCURRENCY VERDICT: PASS (Zero data races, exact balance preserved)");
         } else {
-            System.err.printf("CONCURRENCY VERDICT: FAIL! Discrepancy: %d shares%n",
+            System.err.printf("CONCURRENCY VERDICT: FAIL! Discrepancy: %d shares lost or duplicated%n",
                     totalSubmitted - accountedShares);
         }
     }
