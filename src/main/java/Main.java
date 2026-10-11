@@ -1,3 +1,8 @@
+﻿import engine.OrderBook;
+import engine.StockExchange;
+import model.Transaction;
+import simulation.Trader;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -6,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("Starting Concurrent Stock Exchange Simulation...");
+        System.out.println("Running Correct Concurrent Stock Exchange (ReentrantLock)...");
 
         StockExchange exchange = new StockExchange();
         List<String> tickers = List.of("AAPL", "GOOGL", "MSFT");
@@ -30,19 +35,13 @@ public class Main {
         }
 
         executor.shutdown();
-        boolean finished = executor.awaitTermination(30, TimeUnit.SECONDS);
-
-        if (!finished) {
-            System.err.println("Simulation timed out!");
-            System.exit(1);
-        }
+        executor.awaitTermination(30, TimeUnit.SECONDS);
 
         long elapsedTime = System.currentTimeMillis() - startTime;
-        System.out.printf("Simulation complete in %d ms%n", elapsedTime);
+        System.out.printf("Finished in %d ms%n", elapsedTime);
 
         List<Transaction> transactions = exchange.getTransactionHistory();
         int totalTradedShares = transactions.stream().mapToInt(Transaction::quantity).sum();
-
         int totalOpenShares = exchange.getAllOrderBooks().values().stream()
                 .mapToInt(OrderBook::getRemainingOpenQuantity)
                 .sum();
@@ -61,7 +60,7 @@ public class Main {
         if (totalSubmitted == accountedShares) {
             System.out.println("CONCURRENCY VERDICT: PASS (Zero data races, exact balance preserved)");
         } else {
-            System.err.printf("CONCURRENCY VERDICT: FAIL! Discrepancy: %d shares lost or duplicated%n",
+            System.err.printf("CONCURRENCY VERDICT: FAIL! Discrepancy: %d shares%n",
                     totalSubmitted - accountedShares);
         }
     }

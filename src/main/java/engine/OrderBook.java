@@ -1,3 +1,9 @@
+﻿package engine;
+
+import model.Order;
+import model.OrderType;
+import model.Transaction;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -8,7 +14,7 @@ import java.util.function.Consumer;
 
 public class OrderBook {
     private final String ticker;
-    private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock;
     private static final AtomicLong TX_ID_GENERATOR = new AtomicLong(1);
 
     private final PriorityQueue<Order> bids = new PriorityQueue<>(
@@ -22,7 +28,12 @@ public class OrderBook {
     );
 
     public OrderBook(String ticker) {
+        this(ticker, false);
+    }
+
+    public OrderBook(String ticker, boolean fair) {
         this.ticker = ticker;
+        this.lock = new ReentrantLock(fair);
     }
 
     public void processOrder(Order incomingOrder, Consumer<Transaction> transactionLogger) {
@@ -41,7 +52,6 @@ public class OrderBook {
     private void matchBuyOrder(Order buyOrder, Consumer<Transaction> transactionLogger) {
         while (!asks.isEmpty() && !buyOrder.isFilled()) {
             Order bestAsk = asks.peek();
-
             if (buyOrder.getPrice() < bestAsk.getPrice()) {
                 break;
             }
@@ -78,7 +88,6 @@ public class OrderBook {
     private void matchSellOrder(Order sellOrder, Consumer<Transaction> transactionLogger) {
         while (!bids.isEmpty() && !sellOrder.isFilled()) {
             Order bestBid = bids.peek();
-
             if (sellOrder.getPrice() > bestBid.getPrice()) {
                 break;
             }
@@ -115,9 +124,9 @@ public class OrderBook {
     public boolean cancelOrder(long orderId) {
         lock.lock();
         try {
-            boolean removed = bids.removeIf(order -> order.getOrderId() == orderId);
+            boolean removed = bids.removeIf(o -> o.getOrderId() == orderId);
             if (!removed) {
-                removed = asks.removeIf(order -> order.getOrderId() == orderId);
+                removed = asks.removeIf(o -> o.getOrderId() == orderId);
             }
             return removed;
         } finally {
