@@ -1,3 +1,5 @@
+package model;
+
 public record Transaction(
         long transactionId,
         String ticker,

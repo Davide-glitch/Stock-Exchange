@@ -1,6 +1,9 @@
+package model;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Order {
+    // AtomicLong provides lock-free, atomic ID generation via CPU CAS instructions
     private static final AtomicLong ID_GENERATOR = new AtomicLong(1);
 
     private final long orderId;
@@ -33,14 +36,11 @@ public class Order {
     public long getTimestamp() { return timestamp; }
 
     public void deductQuantity(int amount) {
-        if (amount > remainingQuantity) {
-            throw new IllegalArgumentException("Deduction exceeds remaining quantity");
-        }
         this.remainingQuantity -= amount;
     }
 
     public boolean isFilled() {
-        return this.remainingQuantity == 0;
+        return this.remainingQuantity <= 0;
     }
 
     @Override
